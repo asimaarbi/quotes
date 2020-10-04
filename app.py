@@ -15,9 +15,11 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = '5791628bb0b13ce0c676dfde280ba245'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///main.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+db = SQLAlchemy()
+ma = Marshmallow()
+
 api = Api(app)
-db = SQLAlchemy(app)
-ma = Marshmallow(app)
 
 
 class Quote(db.Model):
@@ -27,6 +29,7 @@ class Quote(db.Model):
     english = db.Column(db.String(1000), nullable=True)
     portuguese = db.Column(db.String(1000), nullable=True)
     spanish = db.Column(db.String(1000), nullable=True)
+    color = db.Column(db.String(20), nullable=True)
 
 
 class QuoteSchema(ma.SQLAlchemyAutoSchema):
@@ -98,13 +101,22 @@ class MyAdminIndexView(AdminIndexView):
     def index(self):
         if not session.get('logged_in'):
             return render_template('login.html')
-        return super().index()
+        quote = Quote.query.filter_by(date='2020-10-03').first()
+        return self.render('admin/index.html', name=quote)
 
 
 class QuoteModelView(ModelView):
     can_edit = True
     can_create = True
     form_overrides = dict(date=DateTimeField)
+
+    def create_model(self, form):
+        model = super().create_model(form)
+        date = str(form.data['date']).split(' ')
+        model.date = date[0]
+        db.session.add(model)
+        db.session.commit()
+        return model
 
 
 admin = admin.Admin(app, name='Qoutes', index_view=MyAdminIndexView(name='Home'), url='/admin')
@@ -114,4 +126,7 @@ api.add_resource(AuthourQouteResource, '/api/author_quotes/<author>')
 api.add_resource(GetQuoteResource, '/api/quotes/')
 
 if __name__ == '__main__':
+    db.init_app(app)
+    ma.init_app(app)
+    db.create_all(app=app)
     app.run(host='0.0.0.0', port=7000, debug=True)
