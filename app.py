@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from flask import Flask, redirect, render_template, request, session
 from flask_admin.form import DateTimeField
 from flask_sqlalchemy import SQLAlchemy
@@ -40,11 +42,12 @@ class QuoteSchema(ma.SQLAlchemyAutoSchema):
 class QuoteResource(Resource):
     def post(self):
         parser = reqparse.RequestParser(bundle_errors=True)
-        parser.add_argument('date', type=str, help='username of the User', required=True)
-        parser.add_argument('author', type=str, help='Fisrt name of the User', required=True)
-        parser.add_argument('english', type=str, help='Last name of the User', required=True)
-        parser.add_argument('portoguese', type=str, help='Email of the User', required=True)
-        parser.add_argument('spanish', type=str, help='Password of the User', required=True)
+        parser.add_argument('date', type=str, help='Enter date in format(d-m-y)', required=True)
+        parser.add_argument('author', type=str, help='Enter author', required=True)
+        parser.add_argument('english', type=str, help='Enter quote in english', required=True)
+        parser.add_argument('portoguese', type=str, help='Enter quote in portoguese', required=True)
+        parser.add_argument('spanish', type=str, help='Enter quote in spanish', required=True)
+        parser.add_argument('color', type=str, help='Enter color in #', required=True)
         args = parser.parse_args(strict=True)
 
         custom_args = {}
@@ -77,16 +80,31 @@ class GetQuoteResource(Resource):
         return schema.dump(Quote.query.all())
 
 
-def load_user(session):
-    if session['logged_in'] == session:
-        return True
+@app.route('/create', methods=['POST'])
+def create():
+    dated = request.form['date']
+    author = request.form['author']
+    english = request.form['english']
+    spanish = request.form['spanish']
+    portuguese = request.form['portuguese']
+    color = request.form['color']
+    quote = Quote()
+    quote.date = dated
+    quote.author = author
+    quote.english = english
+    quote.spanish = spanish
+    quote.portuguese = portuguese
+    quote.color = color
+    db.session.add(quote)
+    db.session.commit()
+    return redirect('/quote')
 
 
 @app.route('/login', methods=['POST'])
 def login():
     if request.form['username'] == 'admin' and request.form['password'] == 'password':
         session['logged_in'] = True
-        return redirect('/quote')
+        return redirect('/admin')
     return render_template('login.html')
 
 
@@ -101,22 +119,14 @@ class MyAdminIndexView(AdminIndexView):
     def index(self):
         if not session.get('logged_in'):
             return render_template('login.html')
-        quote = Quote.query.filter_by(date='2020-10-03').first()
+        date = datetime.today().strftime('%d-%m-%Y')
+        quote = Quote.query.filter_by(date=date).first()
         return self.render('admin/index.html', name=quote)
 
 
 class QuoteModelView(ModelView):
     can_edit = True
     can_create = True
-    form_overrides = dict(date=DateTimeField)
-
-    def create_model(self, form):
-        model = super().create_model(form)
-        date = str(form.data['date']).split(' ')
-        model.date = date[0]
-        db.session.add(model)
-        db.session.commit()
-        return model
 
 
 admin = admin.Admin(app, name='Qoutes', index_view=MyAdminIndexView(name='Home'), url='/admin')
