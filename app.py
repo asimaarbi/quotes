@@ -100,6 +100,11 @@ def create():
     return redirect('/quote')
 
 
+@app.route('/', methods=['GET', 'POST'])
+def home():
+    return redirect('/admin')
+
+
 @app.route('/login', methods=['POST'])
 def login():
     if request.form['username'] == 'admin' and request.form['password'] == 'password':
