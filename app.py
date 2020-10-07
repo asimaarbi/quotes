@@ -107,7 +107,7 @@ def home():
 
 @app.route('/login', methods=['POST'])
 def login():
-    if request.form['username'] == 'admin' and request.form['password'] == 'password':
+    if request.form['username'] == 'barrozricardo@gmail.com' and request.form['password'] == 'Rumi%94Ei':
         session['logged_in'] = True
         return redirect('/admin')
     return render_template('login.html')
