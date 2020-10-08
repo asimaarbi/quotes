@@ -31,7 +31,8 @@ class Quote(db.Model):
     english = db.Column(db.String(1000), nullable=True)
     portuguese = db.Column(db.String(1000), nullable=True)
     spanish = db.Column(db.String(1000), nullable=True)
-    color = db.Column(db.String(20), nullable=True)
+    background_color = db.Column(db.String(20), nullable=True)
+    elements_color = db.Column(db.String(20), nullable=True)
 
 
 class QuoteSchema(ma.SQLAlchemyAutoSchema):
@@ -44,10 +45,11 @@ class QuoteResource(Resource):
         parser = reqparse.RequestParser(bundle_errors=True)
         parser.add_argument('date', type=str, help='Enter date in format(d-m-y)', required=True)
         parser.add_argument('author', type=str, help='Enter author', required=True)
-        parser.add_argument('english', type=str, help='Enter quote in english', required=True)
-        parser.add_argument('portoguese', type=str, help='Enter quote in portoguese', required=True)
-        parser.add_argument('spanish', type=str, help='Enter quote in spanish', required=True)
-        parser.add_argument('color', type=str, help='Enter color in #', required=True)
+        parser.add_argument('english', type=str, help='Enter quote in English', required=True)
+        parser.add_argument('portuguese', type=str, help='Enter quote in Portuguese', required=True)
+        parser.add_argument('spanish', type=str, help='Enter quote in Spanish', required=True)
+        parser.add_argument('background_color', type=str, help='Enter color in #', required=True)
+        parser.add_argument('elements_color', type=str, help='Enter color in #', required=True)
         args = parser.parse_args(strict=True)
 
         custom_args = {}
@@ -87,14 +89,16 @@ def create():
     english = request.form['english']
     spanish = request.form['spanish']
     portuguese = request.form['portuguese']
-    color = request.form['color']
+    background_color = request.form['background_color']
+    elements_color = request.form['elements_color']
     quote = Quote()
     quote.date = dated
     quote.author = author
     quote.english = english
     quote.spanish = spanish
     quote.portuguese = portuguese
-    quote.color = color
+    quote.background_color = background_color
+    quote.elements_color = elements_color
     db.session.add(quote)
     db.session.commit()
     return redirect('/quote')
