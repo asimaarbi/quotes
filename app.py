@@ -76,9 +76,8 @@ class AuthourQouteResource(Resource):
 class GetQuoteResource(Resource):
     def get(self):
         quote = Quote.query.all()
-        length = len(quote)
         schema = QuoteSchema(many=True)
-        result = {f'Total Quotes : {length}': schema.dump(quote)}
+        result = {f'Total Quotes : {len(quote)}': schema.dump(quote)}
         return result
 
 
