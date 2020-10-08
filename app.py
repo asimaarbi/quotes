@@ -10,7 +10,7 @@ from flask_admin.menu import MenuLink
 from flask_restful import Resource, Api, reqparse
 from flask_marshmallow import Marshmallow
 
-app = Flask(__name__)
+app = Flask(__name__, )
 app.config['SECRET_KEY'] = '5791628bb0b13ce0c676dfde280ba245'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///main.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -77,8 +77,9 @@ class GetQuoteResource(Resource):
     def get(self):
         quote = Quote.query.all()
         schema = QuoteSchema(many=True)
-        result = {f'Total Quotes : {len(quote)}': schema.dump(quote)}
-        return result
+        result = {f'Total Quotes': f'{len(quote)}',
+                  'quotes': schema.dump(quote)}
+        return result, 200
 
 
 @app.route('/create', methods=['POST'])
