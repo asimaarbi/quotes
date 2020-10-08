@@ -28,7 +28,8 @@ class Quote(db.Model):
     english = db.Column(db.String(1000), nullable=True)
     portuguese = db.Column(db.String(1000), nullable=True)
     spanish = db.Column(db.String(1000), nullable=True)
-    color = db.Column(db.String(20), nullable=True)
+    background_color = db.Column(db.String(20), nullable=True)
+    elements_color = db.Column(db.String(20), nullable=True)
 
 
 class QuoteSchema(ma.SQLAlchemyAutoSchema):
@@ -44,7 +45,8 @@ class QuoteResource(Resource):
         parser.add_argument('english', type=str, help='Enter quote in english', required=True)
         parser.add_argument('portoguese', type=str, help='Enter quote in portoguese', required=True)
         parser.add_argument('spanish', type=str, help='Enter quote in spanish', required=True)
-        parser.add_argument('color', type=str, help='Enter color in #', required=True)
+        parser.add_argument('background_color', type=str, help='Enter color in #', required=True)
+        parser.add_argument('elements_color', type=str, help='Enter color in #', required=True)
         args = parser.parse_args(strict=True)
 
         custom_args = {}
@@ -73,8 +75,11 @@ class AuthourQouteResource(Resource):
 
 class GetQuoteResource(Resource):
     def get(self):
+        quote = Quote.query.all()
+        length = len(quote)
         schema = QuoteSchema(many=True)
-        return schema.dump(Quote.query.all())
+        result = {f'Total Quotes : {length}': schema.dump(quote)}
+        return result
 
 
 @app.route('/create', methods=['POST'])
@@ -84,14 +89,16 @@ def create():
     english = request.form['english']
     spanish = request.form['spanish']
     portuguese = request.form['portuguese']
-    color = request.form['color']
+    background_color = request.form['bg-color']
+    elements_color = request.form['txt&ele']
     quote = Quote()
     quote.date = dated
     quote.author = author
     quote.english = english
     quote.spanish = spanish
     quote.portuguese = portuguese
-    quote.color = color
+    quote.background_color = background_color
+    quote.elements_color = elements_color
     db.session.add(quote)
     db.session.commit()
     return redirect('/quote')
@@ -132,7 +139,7 @@ class QuoteModelView(ModelView):
     can_create = True
 
 
-admin = admin.Admin(app, name=' ', index_view=MyAdminIndexView(name=' '), url='/admin')
+admin = admin.Admin(app, name='R', index_view=MyAdminIndexView(name=' '), url='/admin', )
 admin.add_view(QuoteModelView(Quote, db.session, name='Quotes', url='/quote'))
 admin.add_link(MenuLink(name='Logout', category='', url="/logout"))
 api.add_resource(AuthourQouteResource, '/api/author_quotes/<author>')
