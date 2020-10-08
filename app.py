@@ -1,7 +1,4 @@
-from datetime import datetime
-
 from flask import Flask, redirect, render_template, request, session
-from flask_admin.form import DateTimeField
 from flask_sqlalchemy import SQLAlchemy
 
 from flask_admin.contrib.sqla import ModelView
@@ -124,9 +121,10 @@ class MyAdminIndexView(AdminIndexView):
     def index(self):
         if not session.get('logged_in'):
             return render_template('login.html')
-        date = datetime.today().strftime('%d-%m-%Y')
-        quote = Quote.query.filter_by(date=date).first()
-        return self.render('admin/index.html', name=quote)
+        # date = datetime.today().strftime('%d-%m-%Y')
+        # quote = Quote.query.filter_by(date=date).first()
+        # return self.render('admin/index.html')
+        return redirect('/quote')
 
 
 class QuoteModelView(ModelView):
@@ -134,8 +132,8 @@ class QuoteModelView(ModelView):
     can_create = True
 
 
-admin = admin.Admin(app, name='Qoutes', index_view=MyAdminIndexView(name='Home'), url='/admin')
-admin.add_view(QuoteModelView(Quote, db.session, url='/quote'))
+admin = admin.Admin(app, name=' ', index_view=MyAdminIndexView(name=' '), url='/admin')
+admin.add_view(QuoteModelView(Quote, db.session, name='Quotes', url='/quote'))
 admin.add_link(MenuLink(name='Logout', category='', url="/logout"))
 api.add_resource(AuthourQouteResource, '/api/author_quotes/<author>')
 api.add_resource(GetQuoteResource, '/api/quotes/')

@@ -19,28 +19,38 @@
     <form action="/create" method="POST">
         <label for="favcolor">Date:</label>
         <div id="datetimepicker" class="input-append date">
-            <input type="text" name="date"></input>
+            <input id="date1" type="text" name="date"></input>
             <span class="add-on">
         <i data-time-icon="icon-time" data-date-icon="icon-calendar"></i>
       </span>
         </div>
-
         <label for="favcolor">Author:</label>
         <input type="text" name="author">
 
         <label for="lang0">English:</label>
-        <input type="text" name="english">
+        <textarea type="text" name="english"></textarea>
 
         <label for="lang1">Spanish:</label>
-        <input type="text" name="spanish">
+        <textarea type="text" name="spanish"></textarea>
 
         <label for="lang2">Portuguese:</label>
-        <input type="text" name="portuguese">
-        <div id="cp2" class="input-group colorpicker-component">
-            <input type="text" name="color" value="#00AABB"/>
+        <textarea type="text" name="portuguese"></textarea>
+
+        <label for="bg-color">Background Color:</label>
+        <div id="cp1" class="input-group colorpicker-component">
+            <input type="text" name="color" value="#00000"/>
             <span class="input-group-addon"><i></i></span>
         </div>
 
+        <label for="txt&ele">Text and Elements Color:</label>
+        <div id="cp2" class="input-group colorpicker-component">
+            <input type="text" name="color" value="#00000"/>
+            <span class="input-group-addon"><i></i></span>
+        </div>
+
+        <script type="text/javascript">
+            $('#cp1').colorpicker();
+        </script>
         <script type="text/javascript">
             $('#cp2').colorpicker();
         </script>
@@ -62,6 +72,13 @@
                 format: 'dd-MM-yyyy',
                 language: 'pt-PK'
             });
+        </script>
+        <script>
+            n = new Date();
+            y = n.getFullYear();
+            m = n.getMonth() + 1;
+            d = n.getDate();
+            document.getElementById("date1").value = d + "-" + m + "-" + y;
         </script>
 
         <input type="submit" value="Submit">
